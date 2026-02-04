@@ -29,6 +29,7 @@ jobs:
       env:
         ECR_REPO: ecs-demo
         AWS_ACCOUNT_ID: 838979473447
+        AWS_REGION: us-east-1
       run: |
         IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO:latest
         docker build -t $IMAGE_URI .
