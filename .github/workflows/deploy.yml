@@ -13,25 +13,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Configure AWS credentials (OIDC)
+    - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::838979473447:role/github-actions-ecs-role
+        role-to-assume: arn:aws:iam::838979473447:role/githubactions-role
         aws-region: us-east-1
 
-    - name: Login to Amazon ECR
+    - name: Login to ECR
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build & Push Docker image
+    - name: Build & Push Docker Image
       env:
-        AWS_ACCOUNT_ID: 838979473447
         ECR_REPO: ecs-demo
-        AWS_REGION: us-east-1
+        AWS_ACCOUNT_ID: 838979473447
       run: |
-        IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
+        IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO:latest
         docker build -t $IMAGE_URI .
         docker push $IMAGE_URI
 
