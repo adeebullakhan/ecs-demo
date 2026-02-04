@@ -1,0 +1,42 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::838979473447:role/github-actions-ecs-role
+        aws-region: ap-south-1
+
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build & Push Docker Image
+      env:
+        ECR_REPO: ecs-demo
+        AWS_ACCOUNT_ID: 838979473447
+      run: |
+        IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO:latest
+        docker build -t $IMAGE_URI .
+        docker push $IMAGE_URI
+
+    - name: Deploy ECS Service
+      run: |
+        aws ecs update-service \
+          --cluster ecs-demo-cluster \
+          --service ecs-demo-service \
+          --force-new-deployment
